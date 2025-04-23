@@ -2,65 +2,144 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Avans Kontrol Paneli</title>
+  <title>AEcu Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background: #000;
+      margin: 0;
+      background: black;
       color: white;
       font-family: sans-serif;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .top-bars {
+      display: flex;
+      justify-content: space-between;
       padding: 10px;
     }
-    .status {
-      margin-bottom: 10px;
+
+    .bar-box {
+      width: 48%;
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
     }
-    .status .bt-icon {
-      width: 15px;
-      height: 15px;
-      display: inline-block;
-      border-radius: 50%;
-      background-color: red; /* Bluetooth bağlantısız başlangıç */
+
+    .label {
+      font-size: 14px;
+      color: gray;
     }
-    .data {
+
+    .value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .bar {
+      height: 10px;
+      border-radius: 5px;
+      margin-top: 8px;
+      background: #333;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: limegreen;
+      width: 0%;
+    }
+
+    .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      padding: 10px;
+      font-size: 16px;
+      text-align: left;
     }
-    .data div {
-      background: #111;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 20px;
+
+    .map-section {
+      position: relative;
+      height: 33vh;
+      width: 100%;
     }
-    #map {
-      height: 30vh;
-      background: #222;
-      margin-top: 20px;
-      border-radius: 8px;
+
+    .map-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .bluetooth-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: red;
+      z-index: 10;
+      border: 2px solid white;
     }
   </style>
 </head>
 <body>
 
-  <div class="status">
-    <span>Bluetooth:</span> 
-    <span class="bt-icon" id="btStatus"></span>
+  <div class="top-bars">
+    <div class="bar-box">
+      <div class="label">RPM</div>
+      <div class="value" id="rpmValue">0</div>
+      <div class="bar"><div class="fill" id="rpmFill"></div></div>
+    </div>
+    <div class="bar-box">
+      <div class="label">HIZ</div>
+      <div class="value" id="speedValue">0</div>
+      <div class="bar"><div class="fill" id="speedFill"></div></div>
+    </div>
   </div>
 
-  <div class="data">
-    <div id="rpm">RPM: –</div>
-    <div id="afr">AFR: –</div>
-    <div id="temp">Sıcaklık: –</div>
-    <div id="gear">Vites: –</div>
-    <div id="advance">Avans: –</div>
-    <div id="speed">Hız: –</div>
-    <div id="maxSpeed">Maks. Hız: –</div>
+  <div class="info-grid">
+    <div>AFR: <span id="afr">–</span></div>
+    <div>Vites: <span id="gear">–</span></div>
+    <div>Sıcaklık: <span id="temp">–</span>°C</div>
+    <div>Avans: <span id="advance">–</span>°</div>
+    <div>Maks. Hız: <span id="maxSpeed">–</span> km/h</div>
+    <div></div>
   </div>
 
-  <div id="map">
-    [ Harita burada olacak ]
+  <div class="map-section">
+    <iframe 
+      class="map-frame"
+      src="https://www.openstreetmap.org/export/embed.html"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+    <div class="bluetooth-icon" id="btStatus"></div>
   </div>
+
+  <script>
+    // Simülasyon verisi
+    let rpm = 0;
+    let speed = 0;
+    const maxRPM = 13000;
+    const maxSpeed = 180;
+    let maxSpeedReached = 0;
+
+    setInterval(() => {
+      rpm = (rpm + 500) % (maxRPM + 500);
+      speed = (speed + 10) % (maxSpeed + 10);
+      if (speed > maxSpeedReached) maxSpeedReached = speed;
+
+      document.getElementById("rpmValue").textContent = rpm;
+      document.getElementById("speedValue").textContent = speed;
+      document.getElementById("rpmFill").style.width = (rpm / maxRPM * 100) + "%";
+      document.getElementById("speedFill").style.width = (speed / maxSpeed * 100) + "%";
+      document.getElementById("maxSpeed").textContent = maxSpeedReached;
+    }, 500);
+  </script>
 
 </body>
 </html>
