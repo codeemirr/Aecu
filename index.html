@@ -1,50 +1,66 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speed Meter</title>
+  <meta charset="UTF-8">
+  <title>Avans Kontrol Paneli</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      background: #000;
+      color: white;
+      font-family: sans-serif;
       text-align: center;
-      padding-top: 100px;
-      background-color: #111;
-      color: #0f0;
+      padding: 10px;
     }
-    h1 {
-      font-size: 50px;
+    .status {
+      margin-bottom: 10px;
     }
-    small {
-      color: #888;
+    .status .bt-icon {
+      width: 15px;
+      height: 15px;
+      display: inline-block;
+      border-radius: 50%;
+      background-color: red; /* Bluetooth bağlantısız başlangıç */
+    }
+    .data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .data div {
+      background: #111;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+    }
+    #map {
+      height: 30vh;
+      background: #222;
+      margin-top: 20px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h1 id="speed">Speed: 0.0 km/h</h1>
-  <small>iPhone GPS hız ölçer</small>
 
-  <script>
-    function updateSpeed(pos) {
-      let speed = pos.coords.speed;
-      if (speed === null || speed < 0) speed = 0;
-      speed = (speed * 3.6).toFixed(1);
-      document.getElementById("speed").innerText = "Speed: " + speed + " km/h";
-    }
+  <div class="status">
+    <span>Bluetooth:</span> 
+    <span class="bt-icon" id="btStatus"></span>
+  </div>
 
-    function error(err) {
-      alert("Konum alınamadı: " + err.message);
-    }
+  <div class="data">
+    <div id="rpm">RPM: –</div>
+    <div id="afr">AFR: –</div>
+    <div id="temp">Sıcaklık: –</div>
+    <div id="gear">Vites: –</div>
+    <div id="advance">Avans: –</div>
+    <div id="speed">Hız: –</div>
+    <div id="maxSpeed">Maks. Hız: –</div>
+  </div>
 
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(updateSpeed, error, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 10000
-      });
-    } else {
-      alert("Cihazın GPS desteklemiyor.");
-    }
-  </script>
+  <div id="map">
+    [ Harita burada olacak ]
+  </div>
+
 </body>
 </html>
