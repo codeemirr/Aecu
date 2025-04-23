@@ -4,47 +4,46 @@
   <meta charset="UTF-8">
   <title>AEcu Panel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- PWA Desteği -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-
   <style>
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
       background: black;
       color: white;
       font-family: sans-serif;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
     }
-
+    .top-section {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 10px;
+    }
     .top-bars {
       display: flex;
       justify-content: space-between;
-      padding: 10px;
     }
-
     .bar-box {
       width: 48%;
       background: #111;
       padding: 10px;
       border-radius: 10px;
     }
-
     .label {
       font-size: 14px;
       color: gray;
     }
-
     .value {
       font-size: 28px;
       font-weight: bold;
     }
-
     .bar {
       height: 10px;
       border-radius: 5px;
@@ -52,35 +51,28 @@
       background: #333;
       overflow: hidden;
     }
-
     .fill {
       height: 100%;
       background: limegreen;
       width: 0%;
     }
-
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      padding: 10px;
+      padding-top: 10px;
       font-size: 16px;
       text-align: left;
     }
-
     .map-section {
+      flex: 1;
       position: relative;
-      height: 33vh;
-      width: 100%;
-      margin-top: auto;
     }
-
     .map-frame {
       width: 100%;
       height: 100%;
       border: none;
     }
-
     .bluetooth-icon {
       position: absolute;
       top: 10px;
@@ -96,26 +88,27 @@
 </head>
 <body>
 
-  <div class="top-bars">
-    <div class="bar-box">
-      <div class="label">RPM</div>
-      <div class="value" id="rpmValue">0</div>
-      <div class="bar"><div class="fill" id="rpmFill"></div></div>
+  <div class="top-section">
+    <div class="top-bars">
+      <div class="bar-box">
+        <div class="label">RPM</div>
+        <div class="value" id="rpmValue">0</div>
+        <div class="bar"><div class="fill" id="rpmFill"></div></div>
+      </div>
+      <div class="bar-box">
+        <div class="label">HIZ</div>
+        <div class="value" id="speedValue">0</div>
+        <div class="bar"><div class="fill" id="speedFill"></div></div>
+      </div>
     </div>
-    <div class="bar-box">
-      <div class="label">HIZ</div>
-      <div class="value" id="speedValue">0</div>
-      <div class="bar"><div class="fill" id="speedFill"></div></div>
+    <div class="info-grid">
+      <div>AFR: <span id="afr">–</span></div>
+      <div>Vites: <span id="gear">–</span></div>
+      <div>Sıcaklık: <span id="temp">–</span>°C</div>
+      <div>Avans: <span id="advance">–</span>°</div>
+      <div>Maks. Hız: <span id="maxSpeed">0</span> km/h</div>
+      <div></div>
     </div>
-  </div>
-
-  <div class="info-grid">
-    <div>AFR: <span id="afr">–</span></div>
-    <div>Vites: <span id="gear">–</span></div>
-    <div>Sıcaklık: <span id="temp">–</span>°C</div>
-    <div>Avans: <span id="advance">–</span>°</div>
-    <div>Maks. Hız: <span id="maxSpeed">0</span> km/h</div>
-    <div></div>
   </div>
 
   <div class="map-section">
@@ -129,31 +122,27 @@
   </div>
 
   <script>
-    // Sahte veriler (Bluetooth ile değişecek)
     let rpm = 0;
     const maxRPM = 13000;
     document.getElementById("rpmValue").textContent = rpm;
     document.getElementById("rpmFill").style.width = (rpm / maxRPM * 100) + "%";
 
-    // GPS tabanlı hız
     let maxSpeed = 0;
     const maxDisplaySpeed = 180;
 
     function updateSpeedDisplay(speed) {
       document.getElementById("speedValue").textContent = Math.round(speed);
       document.getElementById("speedFill").style.width = (speed / maxDisplaySpeed * 100) + "%";
-
       if (speed > maxSpeed) {
         maxSpeed = speed;
         document.getElementById("maxSpeed").textContent = Math.round(maxSpeed);
       }
     }
 
-    // GPS'ten hız almak
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
-        position => {
-          let gpsSpeed = position.coords.speed;
+        pos => {
+          let gpsSpeed = pos.coords.speed;
           if (gpsSpeed !== null) {
             const speedKmh = gpsSpeed * 3.6;
             updateSpeedDisplay(speedKmh);
