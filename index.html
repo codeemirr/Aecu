@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speed Meter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #111;
+      color: #0f0;
+    }
+    h1 {
+      font-size: 50px;
+    }
+    small {
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="speed">Speed: 0.0 km/h</h1>
+  <small>iPhone GPS hız ölçer</small>
+
+  <script>
+    function updateSpeed(pos) {
+      let speed = pos.coords.speed;
+      if (speed === null || speed < 0) speed = 0;
+      speed = (speed * 3.6).toFixed(1);
+      document.getElementById("speed").innerText = "Speed: " + speed + " km/h";
+    }
+
+    function error(err) {
+      alert("Konum alınamadı: " + err.message);
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(updateSpeed, error, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+      });
+    } else {
+      alert("Cihazın GPS desteklemiyor.");
+    }
+  </script>
+</body>
+</html>
