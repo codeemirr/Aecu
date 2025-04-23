@@ -65,6 +65,7 @@
       position: relative;
       height: 33vh;
       width: 100%;
+      margin-top: auto;
     }
 
     .map-frame {
@@ -106,7 +107,7 @@
     <div>Vites: <span id="gear">–</span></div>
     <div>Sıcaklık: <span id="temp">–</span>°C</div>
     <div>Avans: <span id="advance">–</span>°</div>
-    <div>Maks. Hız: <span id="maxSpeed">–</span> km/h</div>
+    <div>Maks. Hız: <span id="maxSpeed">0</span> km/h</div>
     <div></div>
   </div>
 
@@ -121,24 +122,42 @@
   </div>
 
   <script>
-    // Simülasyon verisi
+    // Sahte veriler (Bluetooth ile değişecek)
     let rpm = 0;
-    let speed = 0;
     const maxRPM = 13000;
-    const maxSpeed = 180;
-    let maxSpeedReached = 0;
+    document.getElementById("rpmValue").textContent = rpm;
+    document.getElementById("rpmFill").style.width = (rpm / maxRPM * 100) + "%";
 
-    setInterval(() => {
-      rpm = (rpm + 500) % (maxRPM + 500);
-      speed = (speed + 10) % (maxSpeed + 10);
-      if (speed > maxSpeedReached) maxSpeedReached = speed;
+    // GPS tabanlı hız
+    let maxSpeed = 0;
+    const maxDisplaySpeed = 180;
 
-      document.getElementById("rpmValue").textContent = rpm;
-      document.getElementById("speedValue").textContent = speed;
-      document.getElementById("rpmFill").style.width = (rpm / maxRPM * 100) + "%";
-      document.getElementById("speedFill").style.width = (speed / maxSpeed * 100) + "%";
-      document.getElementById("maxSpeed").textContent = maxSpeedReached;
-    }, 500);
+    function updateSpeedDisplay(speed) {
+      document.getElementById("speedValue").textContent = Math.round(speed);
+      document.getElementById("speedFill").style.width = (speed / maxDisplaySpeed * 100) + "%";
+
+      if (speed > maxSpeed) {
+        maxSpeed = speed;
+        document.getElementById("maxSpeed").textContent = Math.round(maxSpeed);
+      }
+    }
+
+    // GPS'ten hız almak
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        position => {
+          let gpsSpeed = position.coords.speed;
+          if (gpsSpeed !== null) {
+            const speedKmh = gpsSpeed * 3.6;
+            updateSpeedDisplay(speedKmh);
+          }
+        },
+        err => console.warn("GPS hatası:", err),
+        { enableHighAccuracy: true, maximumAge: 1000 }
+      );
+    } else {
+      alert("GPS desteklenmiyor.");
+    }
   </script>
 
 </body>
